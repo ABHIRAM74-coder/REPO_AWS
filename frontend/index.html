@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family File Portal - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="login-container">
+        <div class="login-card">
+            <div class="logo">☁</div>
+            <h1>Family File Portal</h1>
+            <p class="subtitle">Securely access your files</p>
+
+            <form id="loginForm">
+                <label for="email">Email Address</label>
+                <input type="email" id="email"
+                       placeholder="Enter your email"
+                       autocomplete="username" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password"
+                       placeholder="Enter your password"
+                       autocomplete="current-password" required>
+
+                <button type="submit" id="loginBtn">
+                    Login
+                </button>
+            </form>
+
+            <p id="message" role="status"></p>
+
+            <p class="footer-text">
+                Secure file storage powered by AWS
+            </p>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
