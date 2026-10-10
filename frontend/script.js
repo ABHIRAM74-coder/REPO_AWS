@@ -1,5 +1,5 @@
 
-import { Amplify } from "aws-amplify";
+import "./auth.js";
 
 import {
     signUp,
