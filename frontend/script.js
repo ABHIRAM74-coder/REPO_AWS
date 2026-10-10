@@ -5,78 +5,103 @@ import {
     signUp,
     confirmSignUp,
     signIn,
-    signOut,
-    getCurrentUser
+    getCurrentUser,
+    fetchAuthSession
 } from "aws-amplify/auth";
 
-// REPLACE THESE TWO VALUES WITH YOUR COGNITO DETAILS
-const USER_POOL_ID = "ap-southeast-2_VKVaYXCdI";
-const USER_POOL_CLIENT_ID = "7rncn60rvmk14o3gdn598fu6kl";
-
-
+// HTML elements
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const verifyForm = document.getElementById("verifyForm");
 const accountSection = document.getElementById("accountSection");
 const message = document.getElementById("message");
 
+const showSignup = document.getElementById("showSignup");
+const showLogin = document.getElementById("showLogin");
+
 let pendingEmail = "";
 
+// Display only the selected section
 function showSection(section) {
-    [loginForm, signupForm, verifyForm, accountSection]
-        .forEach(element => {
+    [
+        loginForm,
+        signupForm,
+        verifyForm,
+        accountSection
+    ].forEach(element => {
+        if (element) {
             element.hidden = element !== section;
-        });
+        }
+    });
 
-    message.textContent = "";
+    if (message) {
+        message.textContent = "";
+    }
 }
 
+// Display messages
 function showMessage(text) {
-    message.textContent = text;
+    if (message) {
+        message.textContent = text;
+    }
 }
 
-document.getElementById("showSignup").onclick = (event) => {
+// Show signup form
+showSignup.addEventListener("click", (event) => {
     event.preventDefault();
     showSection(signupForm);
-};
+});
 
-document.getElementById("showLogin").onclick = (event) => {
+// Show login form
+showLogin.addEventListener("click", (event) => {
     event.preventDefault();
     showSection(loginForm);
-};
+});
 
 // SIGN UP
 signupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const email = document.getElementById("signupEmail")
+    const email = document
+        .getElementById("signupEmail")
         .value.trim();
 
-    const password = document.getElementById("signupPassword")
+    const password = document
+        .getElementById("signupPassword")
         .value;
 
     try {
         const result = await signUp({
             username: email,
-            password,
+            password: password,
             options: {
                 userAttributes: {
-                    email
+                    email: email
                 }
             }
         });
 
         pendingEmail = email;
 
-        if (result.nextStep.signUpStep === "CONFIRM_SIGN_UP") {
+        if (
+            result.nextStep?.signUpStep ===
+            "CONFIRM_SIGN_UP"
+        ) {
             showSection(verifyForm);
-            showMessage("Verification code sent to your email.");
+            showMessage(
+                "Verification code sent to your email."
+            );
         } else if (result.isSignUpComplete) {
             showSection(loginForm);
-            showMessage("Account created. Please log in.");
+            showMessage(
+                "Account created. Please log in."
+            );
         }
+
     } catch (error) {
-        showMessage(error.message || "Sign up failed.");
+        showMessage(
+            error.message || "Sign up failed."
+        );
     }
 });
 
@@ -84,7 +109,8 @@ signupForm.addEventListener("submit", async (event) => {
 verifyForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const code = document.getElementById("verifyCode")
+    const code = document
+        .getElementById("verifyCode")
         .value.trim();
 
     try {
@@ -93,12 +119,19 @@ verifyForm.addEventListener("submit", async (event) => {
             confirmationCode: code
         });
 
-        document.getElementById("loginEmail").value = pendingEmail;
+        document.getElementById(
+            "loginEmail"
+        ).value = pendingEmail;
 
         showSection(loginForm);
-        showMessage("Email verified! Please log in.");
+        showMessage(
+            "Email verified! Please log in."
+        );
+
     } catch (error) {
-        showMessage(error.message || "Verification failed.");
+        showMessage(
+            error.message || "Verification failed."
+        );
     }
 });
 
@@ -106,52 +139,60 @@ verifyForm.addEventListener("submit", async (event) => {
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const username = document.getElementById("loginEmail")
+    const username = document
+        .getElementById("loginEmail")
         .value.trim();
 
-    const password = document.getElementById("loginPassword")
+    const password = document
+        .getElementById("loginPassword")
         .value;
 
     try {
         const result = await signIn({
-            username,
-            password
+            username: username,
+            password: password
         });
 
-       if (result.isSignedIn) {
-    window.location.replace("/uploads.html");
-}
- else {
-            showMessage(
-                "Additional authentication required: " +
-                result.nextStep.signInStep
-            );
+        if (result.isSignedIn) {
+            window.location.replace("/uploads.html");
+            return;
         }
+
+        showMessage(
+            "Additional authentication required: " +
+            (result.nextStep?.signInStep || "Unknown")
+        );
+
     } catch (error) {
-        showMessage(error.message || "Login failed.");
+        showMessage(
+            error.message || "Login failed."
+        );
     }
 });
 
-// LOGOUT
-document.getElementById("logoutBtn")
-    .addEventListener("click", async () => {
-        try {
-            await signOut();
-            showSection(loginForm);
-            showMessage("Logged out successfully.");
-        } catch (error) {
-            showMessage(error.message || "Logout failed.");
-        }
-    });
-
-// RESTORE LOGIN SESSION
+// RESTORE EXISTING LOGIN SESSION
 async function checkSession() {
     try {
         await getCurrentUser();
-        showSection(accountSection);
+
+        const session = await fetchAuthSession();
+
+        if (!session.tokens?.accessToken) {
+            throw new Error("No active session");
+        }
+
+        // Already logged in: go directly to upload page
+        window.location.replace("/uploads.html");
+
     } catch {
+        // Not logged in: show login form
         showSection(loginForm);
     }
 }
 
+// Start with the login form hidden until session check
+showSection(loginForm);
+loginForm.hidden = true;
+
+// Check login session when page loads
 checkSession();
