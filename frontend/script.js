@@ -13,18 +13,6 @@ import {
 const USER_POOL_ID = "ap-southeast-2_VKVaYXCdI";
 const USER_POOL_CLIENT_ID = "7rncn60rvmk14o3gdn598fu6kl";
 
-Amplify.configure({
-    Auth: {
-        Cognito: {
-            userPoolId: USER_POOL_ID,
-            userPoolClientId: USER_POOL_CLIENT_ID,
-            loginWith: {
-                email: true
-            },
-            signUpVerificationMethod: "code"
-        }
-    }
-});
 
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
@@ -130,10 +118,10 @@ loginForm.addEventListener("submit", async (event) => {
             password
         });
 
-        if (result.isSignedIn) {
-            showSection(accountSection);
-            showMessage("Login successful!");
-        } else {
+       if (result.isSignedIn) {
+    window.location.replace("/uploads.html");
+}
+ else {
             showMessage(
                 "Additional authentication required: " +
                 result.nextStep.signInStep
