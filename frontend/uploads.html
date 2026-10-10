@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Upload Files | Family File Portal</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <main class="login-container">
+        <section class="login-card">
+            <div class="logo">☁</div>
+
+            <h1>Family File Portal</h1>
+            <p class="subtitle">
+                Secure cloud file storage
+            </p>
+
+            <h2>Upload Your Files</h2>
+
+            <form id="uploadForm">
+                <label for="fileInput">Choose a file</label>
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg"
+                    required
+                >
+
+                <p>
+                    PDF, Word, PowerPoint, Excel and images
+                </p>
+
+                <button type="submit" id="uploadBtn">
+                    Upload to S3
+                </button>
+            </form>
+
+            <p id="uploadMessage" role="status"
+               aria-live="polite"></p>
+
+            <button type="button" id="logoutBtn">
+                Logout
+            </button>
+
+            <p class="footer-text">
+                Secured with AWS Cognito and Amazon S3
+            </p>
+        </section>
+    </main>
+
+    <script type="module" src="/uploads.js"></script>
+</body>
+</html>
